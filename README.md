@@ -1,98 +1,75 @@
-<!--
-  CureScan Public Case Fork
+# FaceScan CRM
 
-  Employer-facing README:
-  - explains product/business context,
-  - highlights architecture and technical decisions,
-  - shows ownership and execution depth,
-  - keeps setup instructions straightforward.
--->
+FaceScan CRM is a multi-tenant SaaS platform for aesthetic clinics and medical marketing teams.
 
-# CureScan Public Case Fork
+It combines an AI-powered diagnostic funnel, lead capture, attribution tracking, and clinic CRM workflows in one product.
 
-Production-scale multi-tenant SaaS for aesthetic clinics: AI diagnostics, lead capture, conversion tracking, and admin analytics.
+## What the Product Solves
 
-## Product Context
+- Clinic websites need a high-converting diagnostic entry point
+- Marketing teams need clean source-level attribution and conversion visibility
+- Operators need one system to manage multiple clinic brands and locations
 
-CureScan solves a real B2B problem:
-- clinics need a branded diagnostic funnel,
-- marketing teams need source-level attribution,
-- operators need one admin system to manage many clinic tenants.
+FaceScan CRM turns anonymous traffic into structured leads and moves those leads through a measurable conversion funnel.
 
-The platform turns traffic into structured leads and helps teams move those leads through a measurable funnel.
+## Core Capabilities
 
-## My Scope (What This Repo Demonstrates)
+- Multi-tenant architecture with branded clinic configurations
+- AI skin analysis with structured output for consistent UX
+- Lead capture pipeline with anti-abuse controls
+- Conversion webhook ingestion with HMAC signature verification
+- Dashboard for lead operations, analytics, and admin workflows
 
-- Multi-tenant architecture with shared core + tenant overrides
-- Edge middleware tenant routing (`x-client-id` propagation)
-- AI analysis pipeline with schema-validated structured response
-- Lead capture pipeline with anti-abuse controls and funnel state updates
-- Conversion webhook ingestion with HMAC verification
-- Firebase-backed admin/security model (roles, rules, counters)
+## Technical Overview
 
-## Architecture Highlights
+### Tenant Routing
 
-### 1. Tenant Resolution Layer
-- Request host/query is resolved into tenant context in [`middleware.ts`](./middleware.ts)
-- Tenant context is passed downstream via headers
-- App supports branded tenant behavior without code forks
+- Tenant is resolved in [`middleware.ts`](./middleware.ts)
+- Request context is propagated via `x-client-id` and consumed by API routes
+- Single codebase supports multiple clinic brands
 
-### 2. AI Analysis Core
+### AI Analysis API
+
 - Main endpoint: [`app/api/analyze/route.ts`](./app/api/analyze/route.ts)
-- Uses guardrails: rate limiting + schema validation (Zod)
-- Injects clinic-specific context into prompting layer
+- Includes input validation and rate-limiting guards
+- Produces schema-driven response for predictable frontend rendering
 
-### 3. Lead Pipeline
+### Lead & Funnel API
+
 - Main endpoint: [`app/api/submit-lead/route.ts`](./app/api/submit-lead/route.ts)
-- Supports lead creation and progression events
-- Includes anti-bot controls and subscription-aware behavior
+- Handles lead creation, dedupe paths, and funnel status updates
+- Applies session/captcha checks for abuse protection
 
-### 4. Conversion Attribution
-- Webhook endpoint: [`app/api/webhooks/conversion/route.ts`](./app/api/webhooks/conversion/route.ts)
-- Signed payload verification via HMAC
-- Conversion writes mapped back to lead/clinic funnel
+### Conversion Tracking API
 
-## Engineering Decisions and Trade-offs
+- Main endpoint: [`app/api/webhooks/conversion/route.ts`](./app/api/webhooks/conversion/route.ts)
+- Verifies signed payloads before writing conversion events
+- Maps conversions to tenant, source, and lead records
 
-- **Single codebase over per-tenant forks**
-  - Pros: faster rollout, consistent features
-  - Cons: stricter responsibility boundaries needed in config/routing
+## Stack
 
-- **Structured AI output with schema validation**
-  - Pros: predictable frontend rendering
-  - Cons: extra complexity in prompt/schema evolution
+- Next.js 14 (App Router) + TypeScript
+- Firebase (Auth, Firestore, Functions)
+- Tailwind CSS
+- Zod validation
+- Node test runner for critical guard logic
 
-- **Guard logic extracted into testable helpers**
-  - Pros: easier regression testing for critical API behavior
-  - Cons: additional module boundaries to maintain
-
-## Public-Case Hardening Applied
-
-- Removed private runtime artifacts and dumps
-- Sanitized personal emails in scripts/docs
-- Removed JWT fallback secret in session service
-- Removed CAPTCHA bypass behavior in lead submission
-- Added public-safe `.gitignore`, `LICENSE`, CI workflow, and tests
-
-See details: [`PUBLIC_CLEANUP_SUMMARY.md`](./PUBLIC_CLEANUP_SUMMARY.md)
-
-## Local Setup
+## Run Locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-### Required env (minimum)
+Copy `.env.example` to `.env.local` and set minimum required variables:
 
-Copy `.env.example` to `.env.local` and set:
 - `GEMINI_API_KEY`
 - `FIREBASE_SERVICE_PRIVATE_KEY`
 - `FIREBASE_SERVICE_CLIENT_EMAIL`
 - `NEXT_PUBLIC_FIREBASE_*`
 - `CUSTOMER_JWT_SECRET`
 
-## Quality Gates
+## Quality Checks
 
 ```bash
 npm run lint
@@ -101,11 +78,10 @@ npm run test
 npm run build
 ```
 
-## Repository Structure (Core)
+## Project Structure
 
-- `app/` — Next.js app routes + API routes
-- `components/` — UI and feature components
-- `lib/` — domain services, auth, security, integrations
-- `functions/src/` — Firebase Functions source
-- `scripts/` — operational scripts (sanitized)
-
+- `app/` - routes, pages, and API handlers
+- `components/` - UI and domain components
+- `lib/` - business logic, security, integrations
+- `functions/src/` - Firebase Functions source
+- `scripts/` - operational and migration scripts
