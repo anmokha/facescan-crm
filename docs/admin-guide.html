@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CureScan B2B Platform - Руководство администратора</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --dark-lighter: #1e293b;
+            --dark-light: #334155;
+            --gray: #64748b;
+            --light: #f1f5f9;
+            --white: #ffffff;
+            --code-bg: #1e1e1e;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: #f8fafc;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: var(--dark);
+            color: var(--white);
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid var(--dark-light);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-header p {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        .nav-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--dark-light);
+        }
+
+        .nav-section-title {
+            padding: 0 2rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem 2rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--dark-lighter);
+            color: var(--white);
+            border-left-color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--dark-lighter);
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            max-width: 1200px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            opacity: 0.95;
+            max-width: 800px;
+        }
+
+        .section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .section-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .section-title {
+            flex: 1;
+        }
+
+        .section-title h2 {
+            font-size: 1.875rem;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin: 2rem 0 1rem;
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            color: var(--dark);
+            margin: 1.5rem 0 0.75rem;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: var(--code-bg);
+            color: #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid #374151;
+            font-size: 0.875rem;
+            line-height: 1.7;
+        }
+
+        code {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+        }
+
+        p code, li code {
+            background: #f1f5f9;
+            color: #c7254e;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+            color: #475569;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: var(--primary);
+            color: #1e40af;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: var(--warning);
+            color: #92400e;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: var(--success);
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+
+        /* Step Cards */
+        .steps {
+            display: grid;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            margin-top: 0;
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h4 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .section {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Scrollbar Styling */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--dark-lighter);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--dark-light);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🛡️ CureScan</h1>
+                <p>Руководство администратора B2B платформы</p>
+            </div>
+
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">Начало работы</div>
+                    <a href="#access" class="nav-link">Доступ к админ-панели</a>
+                    <a href="#create-clinic" class="nav-link">Создание клиники</a>
+                    <a href="#manage-clinic" class="nav-link">Работа с клиникой</a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Управление</div>
+                    <a href="#leads" class="nav-link">Просмотр лидов</a>
+                    <a href="#branding" class="nav-link">Настройка брендинга</a>
+                    <a href="#domain" class="nav-link">Кастомные домены</a>
+                    <a href="#subscriptions" class="nav-link">Подписки и лимиты</a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Интеграции</div>
+                    <a href="#integrations" class="nav-link">Настройка интеграций</a>
+                    <a href="#testing" class="nav-link">Тестирование</a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Справка</div>
+                    <a href="#limitations" class="nav-link">Ограничения</a>
+                    <a href="#tasks" class="nav-link">Типичные задачи</a>
+                    <a href="#support" class="nav-link">Поддержка</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="hero">
+                <h1>📚 Руководство по администрированию</h1>
+                <p>Полное руководство по управлению CureScan B2B Platform. Создание клиник, настройка интеграций, управление подписками и многое другое.</p>
+            </div>
+
+            <!-- Section 1: Access -->
+            <section id="access" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🔐</div>
+                    <div class="section-title">
+                        <h2>Доступ к админ-панели</h2>
+                        <p>Вход в систему управления</p>
+                    </div>
+                </div>
+
+                <h3>Ваши права доступа</h3>
+                <p>Вы - <strong>Super Admin</strong> с email <code>admin@example.com</code></p>
+
+                <h3>Способы входа</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4><span class="feature-icon">🌐</span> Production</h4>
+                        <pre>https://admin.curescan.pro</pre>
+                        <p>Рекомендуется для работы</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><span class="feature-icon">💻</span> Локальная разработка</h4>
+                        <pre>http://localhost:3000?admin=true</pre>
+                        <p>Для тестирования изменений</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">ℹ️</span>
+                    <div>
+                        <strong>Автоматический редирект</strong><br>
+                        Если вы не авторизованы, система перенаправит вас на страницу входа с параметром <code>?redirect=/admin</code>
+                    </div>
+                </div>
+
+                <h3>Шаги входа</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Откройте админ-панель</h4>
+                            <p>Перейдите на <code>https://admin.curescan.pro</code></p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Войдите через Firebase Auth</h4>
+                            <p>Используйте email: <code>admin@example.com</code></p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>GOD MODE активирован 🛡️</h4>
+                            <p>После успешной авторизации откроется панель управления</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Create Clinic -->
+            <section id="create-clinic" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🏢</div>
+                    <div class="section-title">
+                        <h2>Создание новой клиники</h2>
+                        <p>Добавление B2B клиента в систему</p>
+                    </div>
+                </div>
+
+                <h3>Пошаговая инструкция</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Откройте Registry</h4>
+                            <p>Перейдите в <code>/admin</code> - увидите таблицу всех клиник</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Нажмите "+ New Clinic"</h4>
+                            <p>Кнопка находится справа вверху страницы</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Заполните форму</h4>
+                            <pre>Clinic Name: Epilux Dubai
+Slug (ID):   epilux-dubai (автоматически)
+Owner Email: owner@epilux.ae</pre>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Создайте клинику</h4>
+                            <p>Нажмите "Create Clinic" - документ создастся в Firestore</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Автоматические настройки</h3>
+                <p>При создании клиники автоматически применяются следующие параметры:</p>
+                <pre>{
+  "name": "Epilux Dubai",
+  "slug": "epilux-dubai",
+  "email": "owner@epilux.ae",
+  "plan": "trial",
+  "theme": {
+    "primaryColor": "#ec4899"
+  },
+  "limits": {
+    "leads": 50
+  },
+  "status": "active"
+}</pre>
+
+                <div class="alert alert-success">
+                    <span class="alert-icon">✅</span>
+                    <div>
+                        <strong>Готово к использованию</strong><br>
+                        Клиника сразу доступна по ссылке: <code>https://curescan.pro/checkup?client=epilux-dubai</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Manage Clinic -->
+            <section id="manage-clinic" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🎯</div>
+                    <div class="section-title">
+                        <h2>Работа с клиникой</h2>
+                        <p>Управление и настройка</p>
+                    </div>
+                </div>
+
+                <h3>Функции управления (Actions)</h3>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4><span class="feature-icon">🔵</span> Impersonate</h4>
+                        <p><strong>Что делает:</strong> Вход от имени владельца клиники</p>
+                        <p><strong>Зачем:</strong> Увидеть dashboard клиента, протестировать настройки</p>
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>Ваша текущая сессия завершится!</div>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><span class="feature-icon">📺</span> Open Landing Page</h4>
+                        <p><strong>Что делает:</strong> Открывает чекап-страницу клиники</p>
+                        <p><strong>URL:</strong> <code>/checkup?client={slug}</code></p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><span class="feature-icon">⚙️</span> Edit Settings</h4>
+                        <p><strong>Путь:</strong> <code>/admin/clinics/{id}/settings</code></p>
+                        <p>Настройка домена, темы, модулей, интеграций, подписки</p>
+                    </div>
+                </div>
+
+                <h3>Как вернуться из Impersonate режима</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Выйдите из системы</h4>
+                            <p>Нажмите "Выйти" в sidebar или перейдите на <code>/logout</code></p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Войдите заново</h4>
+                            <p>Используйте ваш admin email: <code>admin@example.com</code></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Leads -->
+            <section id="leads" class="section">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <div class="section-title">
+                        <h2>Просмотр лидов</h2>
+                        <p>Мониторинг всех лидов системы</p>
+                    </div>
+                </div>
+
+                <h3>Global Leads View</h3>
+                <p>Путь: <code>/admin/leads</code></p>
+
+                <h4>Доступные функции:</h4>
+                <ul>
+                    <li>Фильтр по клинике (dropdown "All Clinics")</li>
+                    <li>Сортировка по дате (новые → старые)</li>
+                    <li>Просмотр статуса (new/contacted/booked/converted/lost)</li>
+                    <li>Тип диагностики (skin/hair/nails)</li>
+                    <li>Контактные данные (телефон, email)</li>
+                </ul>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">ℹ️</span>
+                    <div>
+                        <strong>Лимит отображения</strong><br>
+                        Показываются последние 200 лидов (оптимизация производительности)
+                    </div>
+                </div>
+
+                <h3>Структура данных лида</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Поле</th>
+                            <th>Описание</th>
+                            <th>Пример</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>phone</code></td>
+                            <td>Телефон клиента</td>
+                            <td>+971501234567</td>
+                        </tr>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td>Email (опционально)</td>
+                            <td>client@example.com</td>
+                        </tr>
+                        <tr>
+                            <td><code>status</code></td>
+                            <td>Статус обработки</td>
+                            <td>new, contacted, booked, converted, lost</td>
+                        </tr>
+                        <tr>
+                            <td><code>diagnosticType</code></td>
+                            <td>Тип диагностики</td>
+                            <td>skin, hair, nails</td>
+                        </tr>
+                        <tr>
+                            <td><code>clinicId</code></td>
+                            <td>ID клиники</td>
+                            <td>ABC123xyz</td>
+                        </tr>
+                        <tr>
+                            <td><code>createdAt</code></td>
+                            <td>Дата создания</td>
+                            <td>2025-01-02T10:30:00Z</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 5: Branding -->
+            <section id="branding" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🎨</div>
+                    <div class="section-title">
+                        <h2>Настройка брендинга</h2>
+                        <p>Персонализация внешнего вида</p>
+                    </div>
+                </div>
+
+                <h3>Изменение цветовой темы</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Откройте Settings клиники</h4>
+                            <p><code>/admin/clinics/{id}/settings</code></p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Найдите секцию Theme</h4>
+                            <p>Поле "Primary Color"</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Выберите цвет</h4>
+                            <pre>#ec4899  → Pink (по умолчанию)
+#3b82f6  → Blue
+#10b981  → Green
+#f59e0b  → Orange</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Загрузка логотипа</h3>
+                <p>В секции Theme есть поле <code>logoUrl</code>:</p>
+                <ul>
+                    <li>Загрузите логотип на хостинг (например, Cloudinary, S3)</li>
+                    <li>Вставьте URL в поле</li>
+                    <li>Логотип появится в Header чекап-страницы</li>
+                </ul>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">⏱️</span>
+                    <div>
+                        <strong>Кеширование</strong><br>
+                        Изменения применяются через ~60 секунд из-за server-side кеширования
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Custom Domain -->
+            <section id="domain" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🌐</div>
+                    <div class="section-title">
+                        <h2>Настройка кастомного домена</h2>
+                        <p>Подключение собственного домена клиники</p>
+                    </div>
+                </div>
+
+                <h3>Пример: skin.epilux.ae</h3>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>В админке CureScan</h4>
+                            <p>Зайдите в Settings клиники → Custom Domain</p>
+                            <pre>Custom Domain: skin.epilux.ae
+☑️ Active</pre>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>В DNS клиента</h4>
+                            <p>Попросите клиента создать CNAME запись:</p>
+                            <pre>Type:  CNAME
+Name:  skin
+Value: cname.vercel-dns.com
+TTL:   3600</pre>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>В Vercel Dashboard</h4>
+                            <p>Project Settings → Domains → Add Domain</p>
+                            <pre>Domain: skin.epilux.ae</pre>
+                            <p>Vercel автоматически выпустит SSL сертификат</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Готово!</h4>
+                            <p>Клиент может открывать <code>https://skin.epilux.ae</code></p>
+                            <p>Middleware автоматически распознает домен и применит конфигурацию</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠️</span>
+                    <div>
+                        <strong>Время распространения DNS</strong><br>
+                        Изменения DNS могут занять до 24-48 часов для полного распространения
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Subscriptions -->
+            <section id="subscriptions" class="section">
+                <div class="section-header">
+                    <div class="section-icon">📈</div>
+                    <div class="section-title">
+                        <h2>Управление подписками</h2>
+                        <p>Планы и лимиты</p>
+                    </div>
+                </div>
+
+                <h3>Доступные планы</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>План</th>
+                            <th>Лимит лидов</th>
+                            <th>Цена</th>
+                            <th>Особенности</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Trial</strong></td>
+                            <td>50</td>
+                            <td>Бесплатно</td>
+                            <td>Тестовый период</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Starter</strong></td>
+                            <td>500</td>
+                            <td>~$49/мес</td>
+                            <td>Для небольших клиник</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pro</strong></td>
+                            <td>2000</td>
+                            <td>~$149/мес</td>
+                            <td>Популярный выбор</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Enterprise</strong></td>
+                            <td>Unlimited</td>
+                            <td>Custom</td>
+                            <td>Крупные сети клиник</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Изменение плана</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Откройте Settings клиники</h4>
+                            <p>Секция "Subscription"</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Измените план</h4>
+                            <pre>Plan: pro
+Leads Limit: 2000</pre>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Сохраните изменения</h4>
+                            <p>Клиент сразу увидит обновлённый лимит в sidebar</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Визуализация лимита</h3>
+                <p>Клиент видит прогресс-бар использования в sidebar своего dashboard:</p>
+                <ul>
+                    <li><strong>Зелёный</strong> - до 80% использования</li>
+                    <li><strong>Оранжевый</strong> - 80-100%</li>
+                    <li><strong>Красный</strong> - лимит превышен</li>
+                </ul>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">ℹ️</span>
+                    <div>
+                        <strong>Мягкий лимит</strong><br>
+                        Лиды продолжают сохраняться даже после превышения лимита, но клиент видит предупреждение об апгрейде
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: Integrations -->
+            <section id="integrations" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🔧</div>
+                    <div class="section-title">
+                        <h2>Интеграции для клиники</h2>
+                        <p>Подключение внешних систем</p>
+                    </div>
+                </div>
+
+                <h3>Доступные интеграции</h3>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4><span class="feature-icon">🪝</span> Universal Webhook</h4>
+                        <p>Отправка данных на любой URL</p>
+                        <pre>{
+  "webhook_url": "https://crm.com/webhook"
+}</pre>
+                        <p>Отправляет JSON с данными лида при каждой диагностике</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><span class="feature-icon">💇</span> YCLIENTS</h4>
+                        <p>Салонный CRM для beauty-индустрии</p>
+                        <pre>{
+  "active": true,
+  "company_id": "123456",
+  "token": "Bearer abc..."
+}</pre>
+                        <p>Создаёт клиентов в YCLIENTS автоматически</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h4><span class="feature-icon">🎯</span> HubSpot CRM</h4>
+                        <p>Мировая CRM система</p>
+                        <pre>{
+  "active": true,
+  "access_token": "pat-na1-xxx"
+}</pre>
+                        <p>Создаёт контакты в HubSpot</p>
+                    </div>
+                </div>
+
+                <h3>Настройка интеграции</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Откройте Settings клиники</h4>
+                            <p><code>/admin/clinics/{id}/settings</code></p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Секция "Integrations"</h4>
+                            <p>Выберите нужную интеграцию</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Введите credentials</h4>
+                            <p>API ключи, токены, URL'ы</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Включите интеграцию</h4>
+                            <p>Переключите <code>active: true</code></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 9: Testing -->
+            <section id="testing" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🧪</div>
+                    <div class="section-title">
+                        <h2>Тестирование клиники</h2>
+                        <p>Полный тест-сценарий</p>
+                    </div>
+                </div>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Создайте тестовую клинику</h4>
+                            <pre>Name:  Test Clinic
+Slug:  test-clinic
+Email: test@example.com</pre>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Откройте Landing Page</h4>
+                            <p><code>https://curescan.pro/checkup?client=test-clinic</code></p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Пройдите диагностику</h4>
+                            <p>Загрузите тестовое фото, нажмите "Анализировать"</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Impersonate в клинику</h4>
+                            <p>Войдите как владелец, проверьте dashboard, leads, analytics</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Проверьте интеграции</h4>
+                            <p>Настройте webhook на <code>webhook.site</code>, создайте лид, проверьте данные</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-success">
+                    <span class="alert-icon">✅</span>
+                    <div>
+                        <strong>Всё работает?</strong><br>
+                        Теперь можно создавать реальные клиники для бизнеса!
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 10: Limitations -->
+            <section id="limitations" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🚨</div>
+                    <div class="section-title">
+                        <h2>Важные ограничения</h2>
+                        <p>Что нужно знать</p>
+                    </div>
+                </div>
+
+                <h3>Безопасность</h3>
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠️</span>
+                    <div>
+                        <strong>Super Admin доступ</strong><br>
+                        Только <code>admin@example.com</code> и <code>owner@example.com</code> имеют доступ к GOD MODE.
+                        <br><br>
+                        Для добавления нового админа: <code>app/admin/layout.tsx:9-12</code>
+                    </div>
+                </div>
+
+                <h3>Firestore Indexes</h3>
+                <p>Некоторые сложные запросы требуют составных индексов:</p>
+                <ul>
+                    <li>Если видите ошибку "index required" в консоли</li>
+                    <li>Откройте Firebase Console → Firestore → Indexes</li>
+                    <li>Нажмите на ссылку из ошибки - индекс создастся автоматически</li>
+                    <li>Ожидайте ~5-10 минут построения индекса</li>
+                </ul>
+
+                <h3>Кеширование</h3>
+                <p>Client configs кешируются на сервере:</p>
+                <ul>
+                    <li><strong>Время:</strong> 60 секунд</li>
+                    <li><strong>Зачем:</strong> Снижение нагрузки на Firestore</li>
+                    <li><strong>Следствие:</strong> Изменения видны не мгновенно (~1 минута)</li>
+                </ul>
+            </section>
+
+            <!-- Section 11: Common Tasks -->
+            <section id="tasks" class="section">
+                <div class="section-header">
+                    <div class="section-icon">🎯</div>
+                    <div class="section-title">
+                        <h2>Типичные задачи</h2>
+                        <p>Частые операции</p>
+                    </div>
+                </div>
+
+                <h3>Задача 1: Добавить нового клиента</h3>
+                <ol>
+                    <li><code>/admin</code> → "+ New Clinic"</li>
+                    <li>Заполнить форму (Name, Slug, Email)</li>
+                    <li>Create Clinic</li>
+                    <li>Settings → настроить брендинг</li>
+                    <li>Отправить клиенту: <code>/checkup?client={slug}</code></li>
+                </ol>
+
+                <h3>Задача 2: Клиент хочет свой домен</h3>
+                <ol>
+                    <li>Получить желаемый домен (например, <code>scan.beauty.com</code>)</li>
+                    <li>Settings → Custom Domain → указать домен</li>
+                    <li>Дать клиенту DNS инструкцию (CNAME → <code>cname.vercel-dns.com</code>)</li>
+                    <li>Vercel Dashboard → Add Domain</li>
+                    <li>Проверить через 24 часа</li>
+                </ol>
+
+                <h3>Задача 3: Увеличить лимит лидов</h3>
+                <ol>
+                    <li><code>/admin</code> → найти клинику</li>
+                    <li>Settings → Subscription</li>
+                    <li>Plan: "pro", Leads Limit: 2000</li>
+                    <li>Сохранить</li>
+                </ol>
+
+                <h3>Задача 4: Проверить проблему клиента</h3>
+                <ol>
+                    <li><code>/admin</code> → найти клинику</li>
+                    <li>Нажать Impersonate (синяя кнопка)</li>
+                    <li>Изучить dashboard от имени клиента</li>
+                    <li>Logout → войти обратно как admin</li>
+                </ol>
+            </section>
+
+            <!-- Section 12: Support -->
+            <section id="support" class="section">
+                <div class="section-header">
+                    <div class="section-icon">📞</div>
+                    <div class="section-title">
+                        <h2>Поддержка клиентов</h2>
+                        <p>Диагностика проблем</p>
+                    </div>
+                </div>
+
+                <h3>Если клиент сообщает о проблеме</h3>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Проверьте AI Logs</h4>
+                            <p><code>/admin/logs</code> - логи всех диагностик</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Проверьте Global Leads</h4>
+                            <p><code>/admin/leads</code> - фильтр по клинике</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Impersonate</h4>
+                            <p>Войдите как клиент, воспроизведите проблему</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Проверьте Firestore</h4>
+                            <p>Firebase Console → прямой доступ к данным</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Частые проблемы</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Проблема</th>
+                            <th>Решение</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Не приходят лиды</td>
+                            <td>Проверить интеграции, webhook URL, API ключи</td>
+                        </tr>
+                        <tr>
+                            <td>Неправильный цвет темы</td>
+                            <td>Settings → Theme → проверить primaryColor, подождать ~1 мин</td>
+                        </tr>
+                        <tr>
+                            <td>Домен не работает</td>
+                            <td>Проверить DNS (CNAME), Vercel domain settings, подождать 24-48ч</td>
+                        </tr>
+                        <tr>
+                            <td>Превышен лимит</td>
+                            <td>Апгрейд плана в Settings → Subscription</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info">
+                    <span class="alert-icon">💡</span>
+                    <div>
+                        <strong>Полезный совет</strong><br>
+                        Всегда сначала проверяйте проблему через Impersonate - так вы видите ровно то, что видит клиент
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 2px solid var(--border); text-align: center; color: var(--gray);">
+                <p><strong>CureScan B2B Platform</strong> - Руководство администратора</p>
+                <p style="margin-top: 0.5rem;">Обновлено: Январь 2025 | Version 1.0</p>
+                <p style="margin-top: 1rem; font-size: 0.875rem;">
+                    Super Admin: <code>admin@example.com</code>
+                </p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Highlight active section in sidebar
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => observer.observe(section));
+
+        // Print button
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>

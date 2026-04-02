@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+functions/node_modules/
+
+# Next.js build outputs
+.next/
+out/
+
+# Local env / secrets
+.env
+.env.local
+.env.*.local
+
+# Logs and debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Build / cache artifacts
+*.tsbuildinfo
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Local exports and traffic dumps (never commit)
+*.har
+Outscraper-*.json
+all-clinics.json
+best-pilot-clinics*.json
+best-pilot-clinics*.html
+deep_scan_results.json
+ultra_scan_results.json
+firecrawl_test_output.md
+telemetry-id
+

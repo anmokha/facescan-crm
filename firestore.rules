@@ -1,0 +1,173 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Helper Functions ---
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user is an admin (any role)
+    function isAdmin() {
+      return isAuthenticated() &&
+             request.auth.token.get('admin', false) == true;
+    }
+
+    // Check if user is super admin
+    function isSuperAdmin() {
+      return isAuthenticated() &&
+             request.auth.token.get('role', '') == 'super_admin';
+    }
+
+    // Check if user has specific permission
+    function hasPermission(permission) {
+      return isAuthenticated() && (
+        request.auth.token.get('role', '') == 'super_admin' ||
+        request.auth.token.get('permissions', []).hasAny([permission])
+      );
+    }
+
+    // Check if admin has access to specific clinic
+    function hasAccessToClinic(clinicId) {
+      return isAuthenticated() && (
+        // Full access permission
+        hasPermission('leads.read.all') ||
+        // Or clinic is in assigned list
+        (hasPermission('leads.read.own') &&
+         request.auth.token.get('assignedClinics', []).hasAny([clinicId]))
+      );
+    }
+
+    // For documents that have a 'clinicId' field (Leads, Sources, Conversions)
+    function isDocOwner(data) {
+      return isAuthenticated() && data.clinicId == request.auth.uid;
+    }
+
+    // For the Clinic Profile document itself (ID == UID)
+    function isProfileOwner(clinicId) {
+      return isAuthenticated() && request.auth.uid == clinicId;
+    }
+
+    // --- Collections ---
+
+    // 1. Clinics (Profile & Settings)
+    match /clinics/{clinicId} {
+      // Read: Owner OR Admin with access
+      allow read: if isProfileOwner(clinicId) || hasAccessToClinic(clinicId);
+
+      // Create: Owner can create but CANNOT set sensitive fields (plan, limits, etc.)
+      // We enforce that these fields are NOT present in the creation data.
+      allow create: if (isProfileOwner(clinicId) && 
+                        !request.resource.data.keys().hasAny(['plan', 'limits', 'subscriptionStatus']))
+                       || hasPermission('clinics.create');
+
+      // Update: Owner can update SETTINGS but NOT PLANS/LIMITS/SLUG
+      allow update: if (isProfileOwner(clinicId) && 
+                        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['plan', 'limits', 'subscriptionStatus', 'adminNotes', 'slug'])) 
+                       || hasPermission('clinics.update');
+
+      // Delete: Super Admin only
+      allow delete: if hasPermission('clinics.delete');
+
+      // 1a. Social Content Proof
+      match /social_content/{contentId} {
+        allow read: if true; // Publicly readable for AnalysisView
+        allow write: if isProfileOwner(clinicId) || hasAccessToClinic(clinicId);
+      }
+    }
+
+    // 2. Leads (Applications)
+    match /leads/{leadId} {
+      // CREATE: BLOCKED for public direct writes. MUST use /api/submit-lead.
+      allow create: if false; 
+
+      // READ: Owner OR Admin with access to that clinic
+      allow read: if isDocOwner(resource.data) ||
+                     hasAccessToClinic(resource.data.clinicId);
+
+      // UPDATE: Owner OR Admin.
+      // Removed public update permission for security.
+      allow update: if isDocOwner(resource.data) ||
+                       hasPermission('leads.update');
+
+      // DELETE: Owner OR Admin with permission
+      allow delete: if isDocOwner(resource.data) ||
+                       hasPermission('leads.delete');
+    }
+
+    // 2a. Customers (Profiles)
+    match /customers/{customerId} {
+      allow create: if false; // Backend only
+      
+      allow read: if isDocOwner(resource.data) ||
+                     hasAccessToClinic(resource.data.clinicId);
+                     
+      allow update: if isDocOwner(resource.data) ||
+                       hasPermission('leads.update'); // Reusing leads permission for now
+    }
+
+    // 3. Sources (Marketing Config)
+    match /sources/{sourceId} {
+      allow read: if isAuthenticated() && (resource == null || isDocOwner(resource.data));
+      
+      // Create: Must be authenticated and create for own clinic
+      allow create: if isAuthenticated() && request.resource.data.clinicId == request.auth.uid;
+      
+      allow update, delete: if isAuthenticated() && isDocOwner(resource.data);
+    }
+    
+    // 4. Conversions (Webhooks/Sales)
+    match /conversions/{convId} {
+      // Create: server-side only (Admin SDK via /api/webhooks/conversion)
+      allow create: if false;
+      allow read, delete: if isDocOwner(resource.data);
+    }
+
+    // 4a. Traffic Stats (Server-written counters)
+    match /traffic_stats/{statId} {
+      // Read: Owner OR Admin with access to that clinic
+      allow read: if isDocOwner(resource.data) ||
+                     hasAccessToClinic(resource.data.clinicId);
+
+      // Write: server-side only (Admin SDK)
+      allow write: if false;
+    }
+
+    // 5. Usage Logs (Internal)
+    match /usage_logs/{logId} {
+      allow create: if true; // Backend/Client logging
+      allow read: if isAdmin(); // Admins can read
+      allow write, delete: if false; // Only through Admin SDK
+    }
+
+    // 6. Admin Users Collection
+    match /admin_users/{userId} {
+      // Read: Self OR Super Admin
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == userId || isSuperAdmin());
+
+      // Write: Super Admin only (through API)
+      allow write: if hasPermission('admin.grant_role');
+    }
+
+    // 7. Admin Audit Logs Collection (Tamper-proof)
+    match /admin_audit/{logId} {
+      // Create: Server-side only (through Admin SDK)
+      allow create: if false;
+
+      // Read: Super Admin OR users viewing their own actions
+      allow read: if isSuperAdmin() ||
+                     hasPermission('admin.view_audit');
+
+      // Update/Delete: NEVER (tamper-proof)
+      allow update, delete: if false;
+    }
+
+    // Default: Deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
